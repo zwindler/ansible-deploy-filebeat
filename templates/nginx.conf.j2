@@ -1,0 +1,19 @@
+#{{ansible_managed}}
+input {
+    beats {
+        port => "5044"
+        type => nginx
+    }
+}
+filter {
+  if [type] == "nginx" {
+    grok {
+      match => [ "message", "%{COMBINEDAPACHELOG}" ]
+    }
+  }
+}
+output {
+    elasticsearch {
+        hosts => [ "localhost:9200" ]
+    }
+}
