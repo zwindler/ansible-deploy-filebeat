@@ -1,8 +1,13 @@
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
-    -  /var/log/nginx/*.log
+    -  /var/log/nginx/access.log
   document_type: nginx-access
+
+- type: log
+  paths:
+   -  /var/log/nginx/error.log
+  document_type: nginx-error
 
 output.logstash:
   hosts: ["{{logstash_server}}:5044"]
