@@ -24,3 +24,17 @@
     dest: /etc/logstash/conf.d/{{inventory_hostname}}_nginx.conf
   notify: "notify logstash for restart"
   delegate_to: '{{logstash_server}}'
+- name: Create logstash pattern directory
+  file:
+    path: /opt/logstash/patterns/
+    state: directory
+    mode: 0755
+  delegate_to: '{{logstash_server}}'
+- name: Copy nginx template for logstash
+  copy: 
+    src: patterns-nginx
+    dest: /opt/logstash/patterns/nginx
+    owner: logstash
+    group: logstash
+  notify: "notify logstash for restart"
+  delegate_to: '{{logstash_server}}'

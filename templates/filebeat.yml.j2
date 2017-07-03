@@ -1,7 +1,8 @@
 filebeat.prospectors:
 - input_type: log
   paths:
-    - /var/log/*.log
+    -  /var/log/nginx/*.log
+  document_type: nginx-access
 
 output.logstash:
   hosts: ["{{logstash_server}}:5044"]
