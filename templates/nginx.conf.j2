@@ -6,6 +6,7 @@ input {
 }
 
 filter {
+#/var/log/nginx/access.log
   if [type] == "nginx-access" {
     grok {
       match => {
@@ -29,11 +30,17 @@ filter {
     }
   }
 
+#/var/log/nginx/error.log
   if [type] == "nginx-error" {
     grok {
       match => {
-        "message" => '(?<time>%{YEAR}[./]%{MONTHNUM}[./]%{MONTHDAY} %{TIME}) \[%{LOGLEVEL:severity}\] %{POSINT:pid}.%{NUMBER}: %{DATA:errormessage}, client: %{IP:client}, server: %{IPORHOST:server}, request: "%{WORD:request_action} %{DATA:request} HTTP/%{NUMBER:http_version}", host: "%{DATA:target_host}"'
+        "message" => '(?<time>%{YEAR}[./]%{MONTHNUM}[./]%{MONTHDAY} %{TIME}) \[%{LOGLEVEL:severity}\] %{POSINT:pid}.%{NUMBER}: %{DATA:errormessage}, client: %{IP:remote_ip}, server: %{IPORHOST:server}, request: "%{WORD:request_action} %{DATA:request} HTTP/%{NUMBER:http_version}", host: "%{DATA:target_host}"'
       }
+    }
+
+    geoip {
+      source => "remote_ip"
+      target => "geoip"
     }
   }
 
@@ -41,7 +48,7 @@ filter {
 
 output {
     elasticsearch {
-        hosts => [ "localhost:9200" ]
+        hosts => [ "{{ elk_server }}:9200" ]
         index => "logstash-%{+YYYY.MM.dd}"
     }
 }
